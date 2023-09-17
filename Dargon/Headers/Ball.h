@@ -7,8 +7,8 @@ private:
 	bool started = false;
 
 public:
-	//static sf::VideoMode* windowVidMode;
 	sf::Vector2f velocity;
+	const float speed = 500;
 	Ball(float radius = 20);
 	void start();
 	void update(float deltaTime);

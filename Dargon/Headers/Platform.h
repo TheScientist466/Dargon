@@ -7,10 +7,13 @@ class Platform : public sf::RectangleShape {
 public:
 	Platform();
 	~Platform();
+	void ballReflect(bool changeX);
 	virtual void update(float deltaTime) = 0;
 	
 	static const sf::Vector2f size;
 	static Ball* ball;
+
+	sf::Clock cooldownClock;
 };
 
 class Player : public Platform {

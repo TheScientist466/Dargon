@@ -1,5 +1,4 @@
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include "Platform.h"
 #include "Ball.h"
 
@@ -64,12 +63,11 @@ void start() {
 void update(float deltaTime) {
 	if(!halted) {
 		ball.update(deltaTime);
-		//if(ballPos.x < ball.getRadius() || ballPos.x > windowBox.width - ball.getRadius()) {
-		//	ball.velocity.x *= -1;
-		//}
-		//if(ballPos.y < ball.getRadius() || ballPos.y > windowBox.height - ball.getRadius()) {
-		//	ball.velocity.y *= -1;
-		//}
+		sf::Vector2f ballPos = ball.getPosition();
+		if(ballPos.x < ball.getRadius() || ballPos.x >= windowBox.width - ball.getRadius()) {
+			ball.velocity.x *= -1;
+		}
+
 		if(!windowBox.contains(ball.getPosition())) {
 			end();
 		}
