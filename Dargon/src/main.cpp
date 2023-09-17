@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <future>
-#include <vector>
+#include <deque>
 #include <imgui-SFML.h>
 #include <imgui.h>
 
@@ -21,9 +21,10 @@ Player p;
 Enemy e(1);
 int enemyLevel = 0;
 
-std::vector<float> playerPosSamples;
+std::deque<float> playerPosSamples;
 
-bool useMouse = true;
+bool useMouse = false;
+float smoothness = 75.f;
 
 int main() {
 	sf::VideoMode vidM(1600, 900);
@@ -69,7 +70,13 @@ int main() {
 		ImGui::SetWindowPos(ImVec2(0, 0));
 		if(halted)
 			ImGui::Text("Press Spacebar to start playing");
-		ImGui::SliderInt("Enemy Level", &e.level, 0, 5);
+		ImGui::SliderInt("Enemy Level", &e.level, 0, 5, e.level < 1 ? "noob" : e.level > 4 ? "IMPOSSIBLE" : "%d");
+		ImGui::Checkbox("Use Mouse", &useMouse);
+		if(!useMouse) {
+			if(ImGui::SliderFloat("Smoothness", &smoothness, 20.f, 100.f, "%.0f")) {
+				playerPosSamples.clear();
+			}
+		}
 		ImGui::End();
 
 		window->clear();
@@ -110,13 +117,13 @@ void update(float deltaTime) {
 		}
 		else {
 			playerPosSamples.push_back(getSensorVal());
-			if(playerPosSamples.size() == 60) {
+			if(playerPosSamples.size() == (int)smoothness) {
 				float sum = 0;
 				for(float s : playerPosSamples) {
 					sum += s;
 				}
 				p.setPosition(sum * 75 / playerPosSamples.size(), p.getPosition().y);
-				playerPosSamples.erase(playerPosSamples.begin());
+				playerPosSamples.pop_front();
 			}
 		}
 	}
