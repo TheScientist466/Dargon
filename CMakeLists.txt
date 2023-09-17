@@ -14,3 +14,4 @@ project("Dargon")
 # Include sub-projects.
 add_subdirectory("extlibs")
 add_subdirectory("Dargon")
+add_subdirectory("Exp")

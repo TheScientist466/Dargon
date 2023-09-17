@@ -2,3 +2,6 @@
 	path = extlibs/SFML
 	url = https://github.com/SFML/SFML
 	branch = 2.6.x
+[submodule "extlibs/RS-232"]
+	path = extlibs/RS-232
+	url = https://gitlab.com/Teuniz/RS-232.git

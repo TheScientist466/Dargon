@@ -13,4 +13,4 @@ endif()
 
 # TODO: Add tests and install targets if needed.
 target_include_directories(Dargon PUBLIC "Headers/")
-target_link_libraries(Dargon sfml-graphics sfml-window sfml-system)
+target_link_libraries(Dargon sfml-graphics sfml-window sfml-system RS232)
