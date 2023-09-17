@@ -5,3 +5,10 @@
 [submodule "extlibs/RS-232"]
 	path = extlibs/RS-232
 	url = https://gitlab.com/Teuniz/RS-232.git
+[submodule "extlibs/imgui-sfml"]
+	path = extlibs/imgui-sfml
+	url = https://github.com/SFML/imgui-sfml.git
+	branch = 2.6.x
+[submodule "extlibs/imgui"]
+	path = extlibs/imgui
+	url = https://github.com/ocornut/imgui.git

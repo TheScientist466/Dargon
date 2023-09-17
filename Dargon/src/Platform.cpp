@@ -55,5 +55,12 @@ Enemy::Enemy(unsigned int level) {
 
 void Enemy::update(float dt) {
 	ballReflect(false);
-	setPosition(ball->getPosition().x, getPosition().y);
+	auto dir = ball->getPosition() - getPosition();
+	if(level == 5) {
+		setPosition(ball->getPosition().x, getPosition().y);
+	}
+	else {
+		if(level > 0)
+			move(dir.x /((5 - level) * 10.f), 0);
+	}
 }

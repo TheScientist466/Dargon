@@ -27,5 +27,6 @@ class Enemy : public Platform {
 public:
 	Enemy(unsigned int level);
 
+	int level = 1;
 	void update(float deltaTime);
 };

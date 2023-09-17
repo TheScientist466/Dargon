@@ -1,62 +1,43 @@
-#include <rs232.h>
+#include "imgui.h"
+#include "imgui-SFML.h"
 
-/**************************************************
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/System/Clock.hpp>
+#include <SFML/Window/Event.hpp>
 
-file: demo_rx.c
-purpose: simple demo that receives characters from
-the serial port and print them on the screen,
-exit the program by pressing Ctrl-C
+int main() {
+    sf::RenderWindow window(sf::VideoMode(640, 480), "ImGui + SFML = <3");
+    window.setFramerateLimit(60);
+    ImGui::SFML::Init(window);
 
-compile with the command: gcc demo_rx.c rs232.c -Wall -Wextra -o2 -o test_rx
+    sf::CircleShape shape(100.f);
+    shape.setFillColor(sf::Color::Green);
 
-**************************************************/
+    sf::Clock deltaClock;
+    while(window.isOpen()) {
+        sf::Event event;
+        while(window.pollEvent(event)) {
+            ImGui::SFML::ProcessEvent(window, event);
 
-#include <stdlib.h>
-#include <stdio.h>
-
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
-#endif
-
-#include "rs232.h"
-
-
-
-int main()
-{
-    int i, n,
-        cport_nr = 4,        /* /dev/ttyS0 (COM1 on windows) */
-        bdrate = 9600;       /* 9600 baud */
-
-    unsigned char buf[4096];
-
-    char mode[] = {'8','N','1',0};
-
-
-    if(RS232_OpenComport(cport_nr, bdrate, mode, 0))
-    {
-        printf("Can not open comport\n");
-
-        return(0);
-    }
-
-    while(1)
-    {
-        n = RS232_PollComport(cport_nr, buf, 1);
-
-        if(n > 0)
-        {
-            printf("%i\n", buf[0]);
+            if(event.type == sf::Event::Closed) {
+                window.close();
+            }
         }
 
-#ifdef _WIN32
-        Sleep(50);
-#else
-        usleep(100000);  /* sleep for 100 milliSeconds */
-#endif
+        ImGui::SFML::Update(window, deltaClock.restart());
+
+        ImGui::ShowDemoWindow();
+
+        ImGui::Begin("Hello, world!");
+        ImGui::Button("Look at this pretty button");
+        ImGui::End();
+
+        window.clear();
+        window.draw(shape);
+        ImGui::SFML::Render(window);
+        window.display();
     }
 
-    return(0);
+    ImGui::SFML::Shutdown();
 }

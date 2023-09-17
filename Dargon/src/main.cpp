@@ -1,9 +1,12 @@
 #include <SFML/Graphics.hpp>
+#include <future>
+#include <vector>
+#include <imgui-SFML.h>
+#include <imgui.h>
+
 #include "Platform.h"
 #include "Ball.h"
 #include "Sensor.h"
-#include <future>
-#include <vector>
 
 void update(float deltaTime);
 void start();
@@ -16,12 +19,16 @@ bool halted = true;
 Ball ball(15);
 Player p;
 Enemy e(1);
+int enemyLevel = 0;
 
 std::vector<float> playerPosSamples;
+
+bool useMouse = true;
 
 int main() {
 	sf::VideoMode vidM(1600, 900);
 	window = new sf::RenderWindow(vidM, "Dargon", sf::Style::Close);
+	ImGui::SFML::Init(*window);
 	sf::Clock deltaClock;
 	windowBox = sf::FloatRect(sf::Vector2f(0, 0), (sf::Vector2f)window->getSize());
 
@@ -42,6 +49,7 @@ int main() {
 	//window->setFramerateLimit(200);
 	while(window->isOpen()) {
 		while(window->pollEvent(winEvents)) {
+			ImGui::SFML::ProcessEvent(*window, winEvents);
 			switch(winEvents.type) {
 			case sf::Event::Closed:
 				window->close();
@@ -52,14 +60,26 @@ int main() {
 				}
 			}
 		}
-		float deltaTime = deltaClock.restart().asSeconds();
-		update(deltaTime);
+		sf::Time deltaTime = deltaClock.restart();
+		float deltaTimeS = deltaTime.asSeconds();
+		ImGui::SFML::Update(*window, deltaTime);
+		update(deltaTimeS);
+
+		ImGui::Begin("Setup", NULL, ImGuiWindowFlags_NoMove);
+		ImGui::SetWindowPos(ImVec2(0, 0));
+		if(halted)
+			ImGui::Text("Press Spacebar to start playing");
+		ImGui::SliderInt("Enemy Level", &e.level, 0, 5);
+		ImGui::End();
+
 		window->clear();
 		window->draw(e);
 		window->draw(p);
 		window->draw(ball);
+		ImGui::SFML::Render(*window);
 		window->display();
 	}
+	ImGui::SFML::Shutdown();
 	delete window;
 	terminate();
 	fut.get();
@@ -84,15 +104,20 @@ void update(float deltaTime) {
 
 		e.update(deltaTime);
 		p.update(deltaTime);
-		//p.setPosition(sf::Mouse::getPosition(*window).x, p.getPosition().y);
-		playerPosSamples.push_back(getSensorVal());
-		if(playerPosSamples.size() == 20) {
-			float sum = 0;
-			for(float s : playerPosSamples) {
-				sum += s;
+
+		if(useMouse) {
+			p.setPosition(sf::Mouse::getPosition(*window).x, p.getPosition().y);
+		}
+		else {
+			playerPosSamples.push_back(getSensorVal());
+			if(playerPosSamples.size() == 60) {
+				float sum = 0;
+				for(float s : playerPosSamples) {
+					sum += s;
+				}
+				p.setPosition(sum * 75 / playerPosSamples.size(), p.getPosition().y);
+				playerPosSamples.erase(playerPosSamples.begin());
 			}
-			p.setPosition(sum * 75 / playerPosSamples.size(), p.getPosition().y);
-			playerPosSamples.erase(playerPosSamples.begin());
 		}
 	}
 }
